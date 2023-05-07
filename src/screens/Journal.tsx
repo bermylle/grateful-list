@@ -73,7 +73,7 @@ export const Journal = () => {
           <div className="title">
             <h1> What are you grateful for today?</h1>
             <div className="list-counter">
-              <h3>Daily count: {getRemainingDailyCount(gratefulList)}</h3>
+              <h3>Remaining entries: {getRemainingDailyCount(gratefulList)}</h3>
             </div>
           </div>
 
