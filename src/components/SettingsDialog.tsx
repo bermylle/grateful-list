@@ -1,13 +1,10 @@
-import { useState } from "react";
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Button,
-  TextField,
 } from "@mui/material";
-import { resetGratefulListInLocalStorage } from "../services/listActions";
 
 export const SettingsDialog = (props: any) => {
   const handleCancelReset = () => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   TableContainer,
   Table,
@@ -13,18 +13,14 @@ import {
 } from "@mui/material";
 
 export const TableComponent = (props: any) => {
+  const rowsPerPage = 5;
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortColumn, setSortColumn] = useState<string>("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (e: any, newPage: number) => {
+    e.preventDefault();
     setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: any) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
   };
 
   const handleSort = (column: string) => {
