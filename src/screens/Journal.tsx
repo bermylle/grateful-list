@@ -4,6 +4,7 @@ import { Button, TextField, ThemeProvider, createTheme } from "@mui/material";
 
 import "../App.css";
 import {
+  getGratefulListFromLocalStorage,
   getRemainingDailyCount,
   resetGratefulListInLocalStorage,
   saveGratefulListToLocalStorage,
@@ -19,8 +20,13 @@ export const Journal = () => {
   function handleAddGratefulThing(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    const gratefulThingInput = (
+      event.currentTarget.elements.namedItem(
+        "gratefulThing"
+      ) as HTMLInputElement
+    )?.value;
     const newGratefulThing = {
-      input: event.currentTarget.elements.namedItem("gratefulThing")?.value,
+      input: gratefulThingInput,
       date: new Date().toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
@@ -29,8 +35,9 @@ export const Journal = () => {
       totalCount: gratefulList.length + 1,
     };
 
-    setError(newGratefulThing.input === "");
-    if (!newGratefulThing.input) {
+    const isInputEmpty = !gratefulThingInput;
+    setError(isInputEmpty);
+    if (isInputEmpty) {
       return;
     }
 
@@ -38,11 +45,7 @@ export const Journal = () => {
       ...prevGratefulList,
       newGratefulThing,
     ]);
-
-    localStorage.setItem(
-      "gratefulList",
-      JSON.stringify([...gratefulList, newGratefulThing])
-    );
+    saveGratefulListToLocalStorage([...gratefulList, newGratefulThing]);
 
     event.currentTarget.reset();
   }
@@ -53,7 +56,7 @@ export const Journal = () => {
   }
 
   useEffect(() => {
-    const storedList = JSON.parse(localStorage.getItem("gratefulList"));
+    const storedList = getGratefulListFromLocalStorage();
     if (storedList) {
       setGratefulList(storedList);
     }

@@ -36,17 +36,20 @@ export const TableComponent = (props: any) => {
     }
   };
 
-  const sortedRows = [...props.gratefulList].sort((a: any, b: any) => {
+  const sortedRows = [...props.gratefulList].sort((a, b) => {
+    const sortMultiplier = sortDirection === "asc" ? 1 : -1;
+
     if (sortColumn === "input") {
+      return sortMultiplier * a.input.localeCompare(b.input);
+    }
+
+    if (sortColumn === "date") {
       return (
-        (sortDirection === "asc" ? 1 : -1) * a.input.localeCompare(b.input)
-      );
-    } else if (sortColumn === "date") {
-      return (
-        (sortDirection === "asc" ? 1 : -1) *
-        (new Date(a.date) - new Date(b.date))
+        sortMultiplier *
+        (new Date(a.date).getTime() - new Date(b.date).getTime())
       );
     }
+
     return 0;
   });
 
