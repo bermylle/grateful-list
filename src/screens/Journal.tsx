@@ -1,25 +1,36 @@
 import { useEffect, useState } from "react";
+import { GratefulList } from "../constants/List.types";
+import { Button, TextField, ThemeProvider, createTheme } from "@mui/material";
 
 import "../App.css";
 import {
   getRemainingDailyCount,
+  resetGratefulListInLocalStorage,
   saveGratefulListToLocalStorage,
 } from "../services/listActions";
-import { GratefulList } from "../constants/List.types";
+import CssBaseline from "@mui/material/CssBaseline";
+
+import { SettingsComponent } from "../components/SettingsComponent";
 
 export const Journal = () => {
-  let dailyCount = 5;
   const [gratefulList, setGratefulList] = useState<GratefulList>([]);
+  const [error, setError] = useState(false);
 
   function handleAddGratefulThing(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     const newGratefulThing = {
       input: event.currentTarget.elements.namedItem("gratefulThing")?.value,
-      date: new Date(),
+      date: new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "2-digit",
+      }),
       totalCount: gratefulList.length + 1,
     };
 
-    if (!newGratefulThing) {
+    setError(newGratefulThing.input === "");
+    if (!newGratefulThing.input) {
       return;
     }
 
@@ -38,6 +49,7 @@ export const Journal = () => {
 
   function clearGratefulList() {
     setGratefulList([]);
+    resetGratefulListInLocalStorage();
   }
 
   useEffect(() => {
@@ -45,48 +57,61 @@ export const Journal = () => {
     if (storedList) {
       setGratefulList(storedList);
     }
-  }, []);
+  }, [gratefulList]);
+
+  const theme = createTheme({
+    palette: {
+      mode: "dark",
+    },
+  });
 
   return (
     <>
-      <h1>Gratitude Journal</h1>
-      <h3>Daily count: {getRemainingDailyCount(gratefulList)}</h3>
-      <div className="card">
-        <form onSubmit={handleAddGratefulThing}>
-          <label htmlFor="gratefulThing">
-            What are you grateful for today?
-          </label>
-          <input
-            type="text"
-            id="gratefulThing"
-            name="gratefulThing"
-            placeholder="I am very grateful because.. "
-            autoComplete="off"
-          />
-          <div>
-            <button
-              type="submit"
-              onClick={() => saveGratefulListToLocalStorage(gratefulList)}
-              disabled={getRemainingDailyCount(gratefulList) === 0}
-            >
-              Add
-            </button>
-            <button type="button" onClick={clearGratefulList}>
-              Clear
-            </button>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="input-container">
+          <div className="title">
+            <h1> What are you grateful for today?</h1>
+            <div className="list-counter">
+              <h3>Daily count: {getRemainingDailyCount(gratefulList)}</h3>
+            </div>
           </div>
-        </form>
 
-        <ul>
-          {gratefulList.map((item, index) => (
-            <li key={index}>
-              {item.input} <br></br>
-              {item.date.toString()}
-            </li>
-          ))}
-        </ul>
-        <ul></ul>
-      </div>
+          <div className="form-container">
+            <form onSubmit={handleAddGratefulThing}>
+              <TextField
+                id="gratefulThing"
+                name="gratefulThing"
+                label="Input"
+                multiline
+                rows={4}
+                className="input-area"
+                error={error}
+                helperText={error ? "This field is required" : ""}
+                disabled={getRemainingDailyCount(gratefulList) === 0}
+              />
+
+              <div className="button-container">
+                <Button
+                  type="submit"
+                  variant="outlined"
+                  disabled={getRemainingDailyCount(gratefulList) === 0}
+                  sx={{
+                    marginRight: "15px",
+                  }}
+                >
+                  Submit
+                </Button>
+
+                <SettingsComponent
+                  gratefulList={gratefulList}
+                  clear={clearGratefulList}
+                />
+              </div>
+            </form>
+          </div>
+        </div>
+      </ThemeProvider>
     </>
   );
 };
